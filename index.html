@@ -1,0 +1,145 @@
+<html lang="en">
+
+<head>
+  <meta charset="utf-8"/>
+  <title>Wa-Tor</title>
+  
+  <link rel="stylesheet" href="vendor/bootstrap-3.3.7-dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="styles/main.css"/>
+</head>
+
+<body>
+  <div class="header">
+		<nav class="navbar navbar-default">
+			<div class="container">
+				<a class="navbar-brand text-center center-block" href="#">WA-TOR</a>
+			</div>
+		</nav>
+  </div>
+  
+  <div class="container-full">
+    <div class="row">
+      
+      
+      <!-- RESULTS -->
+      <div class="col-md-2 col-md-offset-1">
+        <div class="panel panel-default">
+          <div class="panel-heading">Results</div>
+          <div class="panel-body">
+          </div>
+        </div>
+      </div>
+      
+      
+      <!-- VIEW -->            
+      <div class="col-md-6">
+        <div class="canvas-container">
+          <canvas id="view" width="800" height="600"></canvas>
+        </div>
+      </div>
+      
+
+      <!-- CONTROLS -->
+      <div class="col-md-2">
+        <div class="panel panel-default">
+          <div class="panel-heading">Controls</div>
+          <div class="panel-body">
+            
+            <!-- control buttons -->
+            <div class="form-group">
+              <button type="button" class="button-reset btn btn-default btn-block">Reset <span class="glyphicon glyphicon-off"></span></button>
+              <button type="button" class="button-start btn btn-default btn-block">Start <span class="glyphicon glyphicon-play"></span></button>
+              <button type="button" class="button-stop btn btn-default btn-block">Pause <span class="glyphicon glyphicon-pause"></span></button>
+            </div>
+            
+            <!-- parameter form -->
+            <form class="form-horizontal">
+              
+              <!-- initial prey -->
+              <div class="form-group">
+                <label class="control-label col-sm-6">Initial prey:</label>
+                <div class="col-sm-6">
+                  <input type="number" class="form-control parameter parameter-initial-prey" value="1000" step="1">
+                </div>
+              </div>
+              
+              <!-- initial predators -->
+              <div class="form-group">
+                <label class="control-label col-sm-6">Initial predators:</label>
+                <div class="col-sm-6">
+                  <input type="number" class="form-control parameter parameter-initial-predators" value="1000" step="1">
+                </div>
+              </div>
+              
+              <!-- prey reproduction age -->
+              <div class="form-group">
+                <label class="control-label col-sm-6">Prey reproduction age:</label>
+                <div class="col-sm-6">
+                  <input type="number" class="form-control parameter parameter-prey-reproduction" value="1" step="1">
+                </div>
+              </div>
+              
+              <!-- predator reproduction age -->
+              <div class="form-group">
+                <label class="control-label col-sm-6">Predator reproduction age:</label>
+                <div class="col-sm-6">
+                  <input type="number" class="form-control parameter parameter-predator-reproduction" value="1" step="1">
+                </div>
+              </div>
+              
+              <!-- prey food value -->
+              <div class="form-group">
+                <label class="control-label col-sm-6">Prey food value:</label>
+                <div class="col-sm-6">
+                  <input type="number" class="form-control parameter parameter-prey-food" value="1" step="1">
+                </div>
+              </div>
+              
+              <!-- predator lifespan -->
+              <div class="form-group">
+                <label class="control-label col-sm-6">Predator lifespan:</label>
+                <div class="col-sm-6">
+                  <input type="number" class="form-control parameter parameter-predator-lifespan" value="1" step="1">
+                </div>
+              </div>
+            
+              <!-- color controls -->
+              <!--div class="form-group">
+                <label class="col-sm-6">Bg.</label>
+                <div class="col-sm-6">
+                  <input type="color" class="background-color parameter" value="#ffffff"/>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label class="col-sm-6">Line</label>
+                <div class="col-sm-6">
+                  <input type="color" class="line-color parameter" value="#000000"/>
+                </div>
+              </div-->
+            
+            </form>
+          </div>
+        </div>        
+      </div>
+    </div>
+  </div>
+  
+  
+  <!-- footer -->
+  <div class="footer">
+    <div class="container">
+        <p class="text-muted">(c) 2017 by Adam Wolniakowski @ www.deltastep.blogspot.com</p>
+    </div>
+  </div>
+  
+  
+  <!-- scripts -->
+  <script src="vendor/jquery/jquery-3.2.0.min.js"></script>
+  <script src="scripts/array2.js"></script>
+  <script src="scripts/wator.js"></script>
+  <script src="scripts/app.js"></script>
+  <script src="scripts/main.js"></script>
+</body>
+
+</html>
