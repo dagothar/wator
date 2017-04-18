@@ -7,6 +7,7 @@ var App = (function() {
     this._running = false;
     this._game = undefined;
     this._view = undefined;
+    this._speed = 100;
   };
   
   
@@ -16,10 +17,12 @@ var App = (function() {
     this._view = $('#view').get(0);
     $('.button-start').show();
     $('.button-stop').hide();
+    $('.slider-speed').val(0);
     
     $('.button-reset').click(function() { self._reset(); });
     $('.button-start').click(function() { self._start(); });
     $('.button-stop').click(function() { self._stop(); });
+    $('.slider-speed').on('input change', function() { self._changeSpeed($(this).val()); });
   }
   
   
@@ -35,7 +38,6 @@ var App = (function() {
     this._game.initialize(1000, 10);
     this._game.render(this._view);
     this._updateUi();
-    
   }
   
   
@@ -53,7 +55,7 @@ var App = (function() {
       
       this._running = true;
       var self = this;
-      this._updateTimer = setInterval(function() { self._update(); }, 10);
+      this._updateTimer = setInterval(function() { self._update(); }, this._speed);
     }
   }
   
@@ -66,6 +68,16 @@ var App = (function() {
       this._running = false;
       clearInterval(this._updateTimer);
     }
+  }
+  
+  
+  App.prototype._changeSpeed = function(val) {
+    this._speed = 100 * Math.pow(1.258925, -val);
+    if (this._running) {
+      clearInterval(this._updateTimer);
+      var self = this;
+      this._updateTimer = setInterval(function() { self._update(); }, this._speed);
+    } 
   }
   
   
