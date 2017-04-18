@@ -9,9 +9,13 @@ $(document).ready(function() {
   
   wator.render(view);
   
-  $('.button-start').click(function() {
+  function update() {
     wator.update();
     wator.render(view);
+  }
+  
+  $('.button-start').click(function() {
+    setInterval(update, 100);
   });
 
 });
