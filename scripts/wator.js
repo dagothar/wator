@@ -34,8 +34,8 @@ var Wator = (function() {
     this._height = height;
     this._data = new Array2(this._width, this._height, new Cell(STATE.EMPTY, 0, 0, false));     
     
-    this._preyReproductionAge = 10;
-    this._predatorReproductionAge = 10;
+    this._preyReproductionAge = 100;
+    this._predatorReproductionAge = 20;
     this._preyFoodValue = 10;
     this._predatorStarvationAge = 10;
   }
@@ -118,6 +118,53 @@ var Wator = (function() {
     /* clear moved flags */
     this._data.apply(function(i, j, x) { x.moved = false; return x; });
     
+    /* move and breed predators */
+    for (var i = 0; i < this._width; ++i) {
+      for (var j = 0; j < this._height; ++j) {
+        var cell = this._data.get(i, j);
+        
+        if (cell.state == STATE.PREDATOR && !cell.moved) {
+          if (cell.moved) {
+            cell.moved = false;
+            continue;
+          }
+          
+          /* update predator */
+          ++cell.age;
+          ++cell.starvation;
+          cell.moved = true;
+          if (cell.starvation > this._predatorStarvationAge) {
+            this._data.set(i, j, new Cell(STATE.EMPTY, 0, 0, true));
+            continue;
+          }
+          
+          /* shall it catch prey OR move? */
+          var target = undefined;
+          var targets = this._getAdjacentEmptyCells(i, j);
+          if (targets.length != 0) {
+            target = targets[Math.round((targets.length-1) * Math.random())];
+          }
+          targets = this._getAdjacentPreyCells(i, j);
+          if (targets.length != 0) {
+            target = targets[Math.round((targets.length-1) * Math.random())];
+            cell.starvation -= this._preyFoodValue;
+          }
+          if (target === undefined) continue;
+
+          /* shall it breed? */
+          if (cell.age >= this._predatorReproductionAge) {
+            cell.age = 0;
+             this._data.set(i, j, new Cell(STATE.PREDATOR, 0, 0, true));
+          } else {
+            this._data.set(i, j, new Cell(STATE.EMPTY, 0, 0, true));
+          }
+          
+          /* place new cell */
+          this._data.set(target.x, target.y, cell);
+        }
+      }
+    }
+    
     /* move and breed prey */
     for (var i = 0; i < this._width; ++i) {
       for (var j = 0; j < this._height; ++j) {
@@ -128,6 +175,10 @@ var Wator = (function() {
             cell.moved = false;
             continue;
           }
+          
+          /* update prey */
+          ++cell.age;
+          cell.moved = true;
           
           /* shall it move? */
           var targets = this._getAdjacentEmptyCells(i, j);
@@ -141,49 +192,7 @@ var Wator = (function() {
           } else {
             this._data.set(i, j, new Cell(STATE.EMPTY, 0, 0, true));
           }
-          
-          /* update prey */
-          ++cell.age;
-          cell.moved = true;
-          
-          /* place new cell */
-          this._data.set(target.x, target.y, cell);
-        }
-      }
-    }
-    
-    /* move and breed predators */
-    for (var i = 0; i < this._width; ++i) {
-      for (var j = 0; j < this._height; ++j) {
-        var cell = this._data.get(i, j);
-        
-        if (cell.state == STATE.PREDATOR && !cell.moved) {
-          if (cell.moved) {
-            cell.moved = false;
-            continue;
-          }
-          
-          /* shall it die? */
-          
-          /* shall it catch prey? */
-          var targets = this._getAdjacentPreyCells(i, j);
-          var target = undefined;
-          if (targets.length != 0) {
-          var target = targets[Math.round((targets.length-1) * Math.random())];
 
-          /* shall it breed? */
-          if (cell.age >= this._preyReproductionAge) {
-            cell.age = 0;
-             this._data.set(i, j, new Cell(STATE.PREY, 0, 0, true));
-          } else {
-            this._data.set(i, j, new Cell(STATE.EMPTY, 0, 0, true));
-          }
-          
-          /* update prey */
-          ++cell.age;
-          ++cell.starvation;
-          cell.moved = true;
-          
           /* place new cell */
           this._data.set(target.x, target.y, cell);
         }
