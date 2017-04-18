@@ -4,7 +4,7 @@ var Wator = (function() {
   
   //! Animal types.
   var TYPE = {
-    EMPTY:      0,
+    NONE:      0,
     PREY:       1,
     PREDATOR:   2
   };
@@ -18,8 +18,8 @@ var Wator = (function() {
   /**
    * @brief Animal struct constructor.
    */
-  function Animal(state, age, starvation, moved) {
-    this.state = state;             // tracks the type of the cell
+  function Animal(type, age, starvation, moved) {
+    this.type = type;             // tracks the type of the cell
     this.age = age;                 // tracks the age for reproduction purposes
     this.starvation = starvation;   // tracks the starvation for predators
     this.moved = moved;             // tracks the movement
@@ -32,7 +32,7 @@ var Wator = (function() {
   function Wator(width, height) {
     this._width = width;
     this._height = height;
-    this._data = new Array2(this._width, this._height, new Animal(TYPE.EMPTY, 0, 0, false));     
+    this._data = new Array2(this._width, this._height, new Animal(TYPE.NONE, 0, 0, false));     
     
     this._preyReproductionAge = 50;
     this._predatorReproductionAge = 110;
@@ -79,7 +79,7 @@ var Wator = (function() {
       var x = Math.floor(this._width * Math.random());
       var y = Math.floor(this._height * Math.random());
       
-      if (this._data.get(x, y).state == TYPE.EMPTY) {
+      if (this._data.get(x, y).type == TYPE.NONE) {
         this._data.set(x, y, new Animal(TYPE.PREY, Math.floor(this._preyReproductionAge * Math.random()), 0, false));
         ++i;
         ++this._preyCount;
@@ -92,7 +92,7 @@ var Wator = (function() {
       var x = Math.floor(this._width * Math.random());
       var y = Math.floor(this._height * Math.random());
       
-      if (this._data.get(x, y).state == TYPE.EMPTY) {
+      if (this._data.get(x, y).type == TYPE.NONE) {
         this._data.set(x, y, new Animal(TYPE.PREDATOR, Math.floor(this._predatorReproductionAge * Math.random()), 0, false));
         ++i;
         ++this._predatorCount;
@@ -111,7 +111,7 @@ var Wator = (function() {
       var nx = (this._width + x + neighbourhood[i][0]) % this._width;
       var ny = (this._height + y + neighbourhood[i][1]) % this._height;
       
-      if (this._data.get(nx, ny).state == TYPE.EMPTY) {
+      if (this._data.get(nx, ny).type == TYPE.NONE) {
         cells.push({ x: nx, y: ny });
       }
     }
@@ -129,7 +129,7 @@ var Wator = (function() {
       var nx = (this._width + x + neighbourhood[i][0]) % this._width;
       var ny = (this._height + y + neighbourhood[i][1]) % this._height;
       
-      if (this._data.get(nx, ny).state == TYPE.PREY) {
+      if (this._data.get(nx, ny).type == TYPE.PREY) {
         cells.push({ x: nx, y: ny });
       }
     }
@@ -175,7 +175,7 @@ var Wator = (function() {
       for (var j = 0; j < this._height; ++j) {
         var animal = this._data.get(i, j);
         
-        if (animal.state == TYPE.PREDATOR && !animal.moved) {
+        if (animal.type == TYPE.PREDATOR && !animal.moved) {
           if (animal.moved) {
             animal.moved = false;
             continue;
@@ -186,7 +186,7 @@ var Wator = (function() {
           ++animal.starvation;
           animal.moved = true;
           if (animal.starvation > this._predatorStarvationAge) {
-            this._placeAnimal(i, j, this._makeAnimal(TYPE.EMPTY));
+            this._placeAnimal(i, j, this._makeAnimal(TYPE.NONE)); // RIP ;(
             --this._predatorCount;
             continue;
           }
@@ -212,7 +212,7 @@ var Wator = (function() {
              ++this._predatorCount;
              ++this._totalPredatorCount;
           } else {
-            this._placeAnimal(i, j, this._makeAnimal(TYPE.EMPTY));
+            this._placeAnimal(i, j, this._makeAnimal(TYPE.NONE));
           }
           
           /* place new animal */
@@ -226,7 +226,7 @@ var Wator = (function() {
       for (var j = 0; j < this._height; ++j) {
         var animal = this._data.get(i, j);
         
-        if (animal.state == TYPE.PREY && !animal.moved) {
+        if (animal.type == TYPE.PREY && !animal.moved) {
           if (animal.moved) {
             animal.moved = false;
             continue;
@@ -248,7 +248,7 @@ var Wator = (function() {
              ++this._preyCount;
              ++this._totalPreyCount;
           } else {
-            this._placeAnimal(i, j, this._makeAnimal(TYPE.EMPTY));
+            this._placeAnimal(i, j, this._makeAnimal(TYPE.NONE));
           }
 
           /* place old animal */
@@ -271,13 +271,13 @@ var Wator = (function() {
     
     for (var i = 0; i < this._width; ++i) {
       for (var j = 0; j < this._height; ++j) {
-        var state = this._data.get(i, j).state;
+        var type = this._data.get(i, j).type;
         
-        if (state == TYPE.EMPTY) {
+        if (type == TYPE.NONE) {
           ctx.fillStyle = 'black';
-        } else if (state == TYPE.PREY) {
+        } else if (type == TYPE.PREY) {
           ctx.fillStyle = 'blue';
-        } else if (state == TYPE.PREDATOR) {
+        } else if (type == TYPE.PREDATOR) {
           ctx.fillStyle = 'red';
         }
         
