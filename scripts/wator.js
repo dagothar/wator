@@ -2,8 +2,8 @@
 
 var Wator = (function() {
   
-  //! Cell states.
-  var STATE = {
+  //! Animal types.
+  var TYPE = {
     EMPTY:      0,
     PREY:       1,
     PREDATOR:   2
@@ -16,9 +16,9 @@ var Wator = (function() {
   
   
   /**
-   * @brief Cell struct constructor.
+   * @brief Animal struct constructor.
    */
-  function Cell(state, age, starvation, moved) {
+  function Animal(state, age, starvation, moved) {
     this.state = state;             // tracks the type of the cell
     this.age = age;                 // tracks the age for reproduction purposes
     this.starvation = starvation;   // tracks the starvation for predators
@@ -32,18 +32,43 @@ var Wator = (function() {
   function Wator(width, height) {
     this._width = width;
     this._height = height;
-    this._data = new Array2(this._width, this._height, new Cell(STATE.EMPTY, 0, 0, false));     
+    this._data = new Array2(this._width, this._height, new Animal(TYPE.EMPTY, 0, 0, false));     
     
-    this._preyReproductionAge = 100;
-    this._predatorReproductionAge = 60;
-    this._predatorStarvationAge = 50;
+    this._preyReproductionAge = 50;
+    this._predatorReproductionAge = 110;
+    this._predatorStarvationAge = 100;
+    this._ageVariance = 0.1;
+    
+    this._chronons = 0;
+    this._preyCount = 0;
+    this._predatorCount = 0;
+    this._totalPreyCount = 0;
+    this._totalPredatorCount = 0;
   }
+  
+  
+  Wator.prototype.getChronons = function() { return this._chronons; }
+  Wator.prototype.getPreyCount = function() { return this._preyCount; }
+  Wator.prototype.getPredatorCount = function() { return this._predatorCount; }
+  Wator.prototype.getTotalPreyCount = function() { return this._totalPreyCount; }
+  Wator.prototype.getTotalPredatorCount = function() { return this._totalPredatorCount; }
+  Wator.prototype.setPreyReproductionAge = function(age) { this._preyReproductionAge = age; }
+  Wator.prototype.setPredatorReproductionAge = function(age) { this._predatorReproductionAge = age; }
+  Wator.prototype.setPredatorStarvationAge = function(age) { this._predatorStarvationAge = age; }
+  Wator.prototype.setAgeVariance = function(age) { this._ageVariance = age; }
   
   
   /**
    * @brief Initializes the game board with the nprey and npredators.
    */
   Wator.prototype.initialize = function(nprey, npredator) {
+    /* clear previous counts */
+    this._chronons = 0;
+    this._preyCount = 0;
+    this._predatorCount = 0;
+    this._totalPreyCount = 0;
+    this._totalPredatorCount = 0;
+    
     /* take care of max. number of prey & predators*/
     var ncells = this._width * this._height;
     if (nprey > ncells) nprey = ncells;
@@ -54,9 +79,11 @@ var Wator = (function() {
       var x = Math.floor(this._width * Math.random());
       var y = Math.floor(this._height * Math.random());
       
-      if (this._data.get(x, y).state == STATE.EMPTY) {
-        this._data.set(x, y, new Cell(STATE.PREY, Math.floor(this._preyReproductionAge * Math.random()), 0, false));
+      if (this._data.get(x, y).state == TYPE.EMPTY) {
+        this._data.set(x, y, new Animal(TYPE.PREY, Math.floor(this._preyReproductionAge * Math.random()), 0, false));
         ++i;
+        ++this._preyCount;
+        ++this._totalPreyCount;
       }
     }
     
@@ -65,9 +92,11 @@ var Wator = (function() {
       var x = Math.floor(this._width * Math.random());
       var y = Math.floor(this._height * Math.random());
       
-      if (this._data.get(x, y).state == STATE.EMPTY) {
-        this._data.set(x, y, new Cell(STATE.PREDATOR, Math.floor(this._predatorReproductionAge * Math.random()), 0, false));
+      if (this._data.get(x, y).state == TYPE.EMPTY) {
+        this._data.set(x, y, new Animal(TYPE.PREDATOR, Math.floor(this._predatorReproductionAge * Math.random()), 0, false));
         ++i;
+        ++this._predatorCount;
+        ++this._totalPredatorCount;
       }
     }
   }
@@ -76,12 +105,13 @@ var Wator = (function() {
   /**
    * @brief Returns an array of empty adjacent cells.
    */
-  Wator.prototype._getAdjacentEmptyCells = function(x, y) {
+  Wator.prototype.getAdjacentEmptySquares = function(x, y) {
     var cells = [];
     for (var i = 0; i < neighbourhood.length; ++i) {
       var nx = (this._width + x + neighbourhood[i][0]) % this._width;
       var ny = (this._height + y + neighbourhood[i][1]) % this._height;
-      if (this._data.get(nx, ny).state == STATE.EMPTY) {
+      
+      if (this._data.get(nx, ny).state == TYPE.EMPTY) {
         cells.push({ x: nx, y: ny });
       }
     }
@@ -93,17 +123,39 @@ var Wator = (function() {
   /**
    * @brief Returns an array of prey adjacent cells.
    */
-  Wator.prototype._getAdjacentPreyCells = function(x, y) {
+  Wator.prototype._getAdjacentPreyAnimals = function(x, y) {
     var cells = [];
     for (var i = 0; i < neighbourhood.length; ++i) {
       var nx = (this._width + x + neighbourhood[i][0]) % this._width;
       var ny = (this._height + y + neighbourhood[i][1]) % this._height;
-      if (this._data.get(nx, ny).state == STATE.PREY) {
+      
+      if (this._data.get(nx, ny).state == TYPE.PREY) {
         cells.push({ x: nx, y: ny });
       }
     }
     
     return cells;
+  }
+  
+  
+  /**
+   * @brief Creates a new animal.
+   * The new animal has 0 starvation and age randomized within the bounds of the AgeVariance.
+   */
+  Wator.prototype._makeAnimal = function(type) {
+    var age_offset = 0;
+    if (type == TYPE.PREY) age_offset = Math.floor(this._ageVariance*this._preyReproductionAge*(2*Math.random()-1));
+    if (type == TYPE.PREDATOR) age_offset = Math.floor(this._ageVariance*this._preyReproductionAge*(2*Math.random()-1));
+    
+    return new Animal(type, age_offset, 0, false);
+  }
+  
+  
+  /**
+   * @brief Places animal at (i, j) coordinates.
+   */
+  Wator.prototype._placeAnimal = function(i, j, animal) {
+    this._data.set(i, j, animal);
   }
   
   
@@ -123,7 +175,7 @@ var Wator = (function() {
       for (var j = 0; j < this._height; ++j) {
         var animal = this._data.get(i, j);
         
-        if (animal.state == STATE.PREDATOR && !animal.moved) {
+        if (animal.state == TYPE.PREDATOR && !animal.moved) {
           if (animal.moved) {
             animal.moved = false;
             continue;
@@ -134,33 +186,37 @@ var Wator = (function() {
           ++animal.starvation;
           animal.moved = true;
           if (animal.starvation > this._predatorStarvationAge) {
-            this._data.set(i, j, new Cell(STATE.EMPTY, 0, 0, true));
+            this._placeAnimal(i, j, this._makeAnimal(TYPE.EMPTY));
+            --this._predatorCount;
             continue;
           }
           
           /* shall it catch prey OR move? */
           var target = undefined;
-          var targets = this._getAdjacentEmptyCells(i, j);
+          var targets = this.getAdjacentEmptySquares(i, j);
           if (targets.length != 0) {
             target = targets[Math.floor(targets.length * Math.random())];
           }
-          targets = this._getAdjacentPreyCells(i, j);
+          targets = this._getAdjacentPreyAnimals(i, j); // this overwrites previous targets generated
           if (targets.length != 0) {
             target = targets[Math.floor(targets.length * Math.random())];
             animal.starvation = 0;
+            --this._preyCount;
           }
           if (target === undefined) continue;
 
           /* shall it breed? */
           if (animal.age >= this._predatorReproductionAge) {
             animal.age = 0;
-             this._data.set(i, j, new Cell(STATE.PREDATOR, 0, 0, true));
+             this._placeAnimal(i, j, this._makeAnimal(TYPE.PREDATOR));
+             ++this._predatorCount;
+             ++this._totalPredatorCount;
           } else {
-            this._data.set(i, j, new Cell(STATE.EMPTY, 0, 0, true));
+            this._placeAnimal(i, j, this._makeAnimal(TYPE.EMPTY));
           }
           
           /* place new animal */
-          this._data.set(target.x, target.y, animal);
+          this._placeAnimal(target.x, target.y, animal);
         }
       }
     }
@@ -170,7 +226,7 @@ var Wator = (function() {
       for (var j = 0; j < this._height; ++j) {
         var animal = this._data.get(i, j);
         
-        if (animal.state == STATE.PREY && !animal.moved) {
+        if (animal.state == TYPE.PREY && !animal.moved) {
           if (animal.moved) {
             animal.moved = false;
             continue;
@@ -181,20 +237,22 @@ var Wator = (function() {
           animal.moved = true;
           
           /* shall it move? */
-          var targets = this._getAdjacentEmptyCells(i, j);
+          var targets = this.getAdjacentEmptySquares(i, j);
           if (targets.length == 0) continue;
           var target = targets[Math.floor(targets.length * Math.random())];
 
           /* shall it breed? */
           if (animal.age >= this._preyReproductionAge) {
             animal.age = 0;
-             this._data.set(i, j, new Cell(STATE.PREY, 0, 0, true));
+             this._placeAnimal(i, j, this._makeAnimal(TYPE.PREY));
+             ++this._preyCount;
+             ++this._totalPreyCount;
           } else {
-            this._data.set(i, j, new Cell(STATE.EMPTY, 0, 0, true));
+            this._placeAnimal(i, j, this._makeAnimal(TYPE.EMPTY));
           }
 
-          /* place new animal */
-          this._data.set(target.x, target.y, animal);
+          /* place old animal */
+          this._placeAnimal(target.x, target.y, animal);
         }
       }
     }
@@ -215,11 +273,11 @@ var Wator = (function() {
       for (var j = 0; j < this._height; ++j) {
         var state = this._data.get(i, j).state;
         
-        if (state == STATE.EMPTY) {
+        if (state == TYPE.EMPTY) {
           ctx.fillStyle = 'black';
-        } else if (state == STATE.PREY) {
+        } else if (state == TYPE.PREY) {
           ctx.fillStyle = 'blue';
-        } else if (state == STATE.PREDATOR) {
+        } else if (state == TYPE.PREDATOR) {
           ctx.fillStyle = 'red';
         }
         
