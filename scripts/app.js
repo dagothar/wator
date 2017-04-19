@@ -7,6 +7,8 @@ var App = (function() {
     this._running = false;
     this._game = undefined;
     this._view = undefined;
+    this._chartView = undefined;
+    this._chart = undefined;
     this._speed = 100;
   };
   
@@ -15,9 +17,15 @@ var App = (function() {
     var self = this;
     
     this._view = $('#view').get(0);
+    this._chartView = $('#chart').get(0);
     $('.button-start').show();
     $('.button-stop').hide();
     $('.slider-speed').val(0);
+    $('.parameter-initial-prey').val(100);
+    $('.parameter-initial-predators').val(100);
+    $('.parameter-prey-reproduction').val(100);
+    $('.parameter-predator-reproduction').val(100);
+    $('.parameter-predator-starvation').val(50);
     
     $('.button-reset').click(function() { self._reset(); });
     $('.button-start').click(function() { self._start(); });
@@ -27,17 +35,33 @@ var App = (function() {
   
   
   App.prototype._updateUi = function() {
-    $('.chronons').text(this._game.getChronons());
-    $('.prey-count').text(this._game.getPreyCount());
-    $('.predator-count').text(this._game.getPredatorCount());
+    var chronons = this._game.getChronons();
+    var prey = this._game.getPreyCount();
+    var totalPrey = this._game.getTotalPreyCount();
+    var predators = this._game.getPredatorCount();
+    
+    $('.chronons').text(chronons);
+    $('.prey-count').text(prey);
+    $('.predator-count').text(predators);
+    $('.kill-count').text(totalPrey - prey);
   }
   
   
   App.prototype._reset = function() {
+    var initialPrey = $('.parameter-initial-prey').val();
+    var initialPredators = $('.parameter-initial-predators').val();
+    var preyReproductionAge = $('.parameter-prey-reproduction').val();
+    var predatorReproductionAge = $('.parameter-predator-reproduction').val();
+    var predatorStarvationAge = $('.parameter-predator-starvation').val();
+    
     this._stop();
-    this._game = new Wator(10, 10);
-    this._game.initialize(1, 0);
+    this._game = new Wator(100, 100);
+    this._game.initialize(initialPrey, initialPredators);
+    this._game.setPreyReproductionAge(preyReproductionAge);
+    this._game.setPredatorReproductionAge(predatorReproductionAge);
+    this._game.setPredatorStarvationAge(predatorStarvationAge);
     this._game.render(this._view);
+    
     this._updateUi();
   }
   

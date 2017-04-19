@@ -145,7 +145,7 @@ var Wator = (function() {
   Wator.prototype._makeAnimal = function(type) {
     var age_offset = 0;
     if (type == TYPE.PREY) age_offset = Math.floor(this._ageVariance*this._preyReproductionAge*(2*Math.random()-1));
-    if (type == TYPE.PREDATOR) age_offset = Math.floor(this._ageVariance*this._preyReproductionAge*(2*Math.random()-1));
+    if (type == TYPE.PREDATOR) age_offset = Math.floor(this._ageVariance*this._predatorReproductionAge*(2*Math.random()-1));
     
     return new Animal(type, age_offset, 0, false);
   }
