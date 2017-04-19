@@ -27,6 +27,7 @@ var App = (function() {
   
   
   App.prototype._updateUi = function() {
+    $('.chronons').text(this._game.getChronons());
     $('.prey-count').text(this._game.getPreyCount());
     $('.predator-count').text(this._game.getPredatorCount());
   }
@@ -34,8 +35,8 @@ var App = (function() {
   
   App.prototype._reset = function() {
     this._stop();
-    this._game = new Wator(100, 100);
-    this._game.initialize(1000, 10);
+    this._game = new Wator(10, 10);
+    this._game.initialize(1, 0);
     this._game.render(this._view);
     this._updateUi();
   }

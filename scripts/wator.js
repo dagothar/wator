@@ -34,7 +34,7 @@ var Wator = (function() {
     this._height = height;
     this._data = new Array2(this._width, this._height, new Animal(TYPE.NONE, 0, 0, false));     
     
-    this._preyReproductionAge = 50;
+    this._preyReproductionAge = 1000;
     this._predatorReproductionAge = 110;
     this._predatorStarvationAge = 100;
     this._ageVariance = 0.1;
@@ -167,6 +167,8 @@ var Wator = (function() {
    * 3. Move and breed prey.
    */
   Wator.prototype.update = function() {
+    ++this._chronons;
+    
     /* clear moved flags */
     this._data.apply(function(i, j, x) { x.moved = false; return x; });
     
@@ -215,7 +217,7 @@ var Wator = (function() {
             this._placeAnimal(i, j, this._makeAnimal(TYPE.NONE));
           }
           
-          /* place new animal */
+          /* place animal at target pos. */
           this._placeAnimal(target.x, target.y, animal);
         }
       }
@@ -251,7 +253,7 @@ var Wator = (function() {
             this._placeAnimal(i, j, this._makeAnimal(TYPE.NONE));
           }
 
-          /* place old animal */
+          /* place animal at target pos. */
           this._placeAnimal(target.x, target.y, animal);
         }
       }
