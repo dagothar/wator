@@ -29,6 +29,7 @@ var App = (function() {
     $('.parameter-prey-reproduction').val(10);
     $('.parameter-predator-reproduction').val(25);
     $('.parameter-predator-starvation').val(10);
+    $('.slider-variance').val(50);
     
     $('.button-reset').click(function() { self._reset(); });
     $('.button-start').click(function() { self._start(); });
@@ -105,12 +106,14 @@ var App = (function() {
     var preyReproductionAge     = parseInt($('.parameter-prey-reproduction').val());
     var predatorReproductionAge = parseInt($('.parameter-predator-reproduction').val());
     var predatorStarvationAge   = parseInt($('.parameter-predator-starvation').val());
+    var ageVariance             = 0.01 * $('.slider-variance').val();
     
     this._stop();
     this._game = new Wator(width, height);
     this._game.setPreyReproductionAge(preyReproductionAge);
     this._game.setPredatorReproductionAge(predatorReproductionAge);
     this._game.setPredatorStarvationAge(predatorStarvationAge);
+    this._game.setAgeVariance(ageVariance);
     this._game.initialize(initialPrey, initialPredators);
     this._game.render(this._view);
     
