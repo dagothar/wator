@@ -10,7 +10,7 @@ var Wator = (function() {
   };
   
   //! Neighbourhood used.
-  var neighbourhood = [
+  var NEIGHBOURHOOD = [
       [-1, 0], [1, 0], [0, -1], [0, 1]
     ];
   
@@ -18,11 +18,28 @@ var Wator = (function() {
   /**
    * @brief Animal struct constructor.
    */
-  function Animal(type, age, starvation, moved) {
+  function Animal(x, y, type, age, starvation, moved) {
+    this.x = x;
+    this.y = y;
     this.type = type;             // tracks the type of the cell
     this.age = age;                 // tracks the age for reproduction purposes
     this.starvation = starvation;   // tracks the starvation for predators
     this.moved = moved;             // tracks the movement
+  }
+  
+  
+  /**
+   * Shuffles array in place.
+   * @param {Array} a items The array containing the items.
+   */
+  function shuffle(a) {
+    var j, x, i;
+    for (i = a.length; i; i--) {
+      j = Math.floor(Math.random() * i);
+      x = a[i - 1];
+      a[i - 1] = a[j];
+      a[j] = x;
+    }
   }
     
   
@@ -32,7 +49,9 @@ var Wator = (function() {
   function Wator(width, height) {
     this._width = width;
     this._height = height;
-    this._data = new Array2(this._width, this._height, new Animal(TYPE.NONE, 0, 0, false));     
+    this._data = new Array2(this._width, this._height, new Animal(0, 0, TYPE.NONE, 0, 0, false));   
+    this._prey = [];
+    this._predators = [];  
     
     this._preyReproductionAge = 1000;
     this._predatorReproductionAge = 110;
@@ -59,9 +78,27 @@ var Wator = (function() {
   
   
   /**
+   * @brief Creates a new animal.
+   * The new animal has 0 starvation and age randomized within the bounds of the variance.
+   */
+  Wator.prototype._makeAnimal = function(x, y, type, variance) {
+    var age_offset = 0;
+    if (type == TYPE.PREY) age_offset = Math.floor(variance*this._preyReproductionAge*(2*Math.random()-1));
+    if (type == TYPE.PREDATOR) age_offset = Math.floor(variance*this._predatorReproductionAge*(2*Math.random()-1));
+    
+    return new Animal(x, y, type, age_offset, 0, false);
+  }
+  
+  
+  /**
    * @brief Initializes the game board with the nprey and npredators.
    */
   Wator.prototype.initialize = function(nprey, npredator) {
+    /* clear data */
+    this._data = new Array2(this._width, this._height, new Animal(0, 0, TYPE.NONE, 0, 0, false));   
+    this._prey = [];
+    this._predators = [];  
+    
     /* clear previous counts */
     this._chronons = 0;
     this._preyCount = 0;
@@ -80,7 +117,9 @@ var Wator = (function() {
       var y = Math.floor(this._height * Math.random());
       
       if (this._data.get(x, y).type == TYPE.NONE) {
-        this._data.set(x, y, new Animal(TYPE.PREY, Math.floor(this._preyReproductionAge * Math.random()), 0, false));
+        var new_prey = this._makeAnimal(x, y, TYPE.PREY, 1.0);
+        this._data.set(x, y, new_prey);
+        this._prey.push(new_prey);
         ++i;
         ++this._preyCount;
         ++this._totalPreyCount;
@@ -93,7 +132,9 @@ var Wator = (function() {
       var y = Math.floor(this._height * Math.random());
       
       if (this._data.get(x, y).type == TYPE.NONE) {
-        this._data.set(x, y, new Animal(TYPE.PREDATOR, Math.floor(this._predatorReproductionAge * Math.random()), 0, false));
+        var new_predator = this._makeAnimal(x, y, TYPE.PREDATOR, 1.0);
+        this._data.set(x, y, new_predator);
+        this._predators.push(new_predator);
         ++i;
         ++this._predatorCount;
         ++this._totalPredatorCount;
@@ -107,9 +148,9 @@ var Wator = (function() {
    */
   Wator.prototype.getAdjacentEmptySquares = function(x, y) {
     var cells = [];
-    for (var i = 0; i < neighbourhood.length; ++i) {
-      var nx = (this._width + x + neighbourhood[i][0]) % this._width;
-      var ny = (this._height + y + neighbourhood[i][1]) % this._height;
+    for (var i = 0; i < NEIGHBOURHOOD.length; ++i) {
+      var nx = (this._width + x + NEIGHBOURHOOD[i][0]) % this._width;
+      var ny = (this._height + y + NEIGHBOURHOOD[i][1]) % this._height;
       
       if (this._data.get(nx, ny).type == TYPE.NONE) {
         cells.push({ x: nx, y: ny });
@@ -125,9 +166,9 @@ var Wator = (function() {
    */
   Wator.prototype._getAdjacentPreyAnimals = function(x, y) {
     var cells = [];
-    for (var i = 0; i < neighbourhood.length; ++i) {
-      var nx = (this._width + x + neighbourhood[i][0]) % this._width;
-      var ny = (this._height + y + neighbourhood[i][1]) % this._height;
+    for (var i = 0; i < NEIGHBOURHOOD.length; ++i) {
+      var nx = (this._width + x + NEIGHBOURHOOD[i][0]) % this._width;
+      var ny = (this._height + y + NEIGHBOURHOOD[i][1]) % this._height;
       
       if (this._data.get(nx, ny).type == TYPE.PREY) {
         cells.push({ x: nx, y: ny });
@@ -135,19 +176,6 @@ var Wator = (function() {
     }
     
     return cells;
-  }
-  
-  
-  /**
-   * @brief Creates a new animal.
-   * The new animal has 0 starvation and age randomized within the bounds of the AgeVariance.
-   */
-  Wator.prototype._makeAnimal = function(type) {
-    var age_offset = 0;
-    if (type == TYPE.PREY) age_offset = Math.floor(this._ageVariance*this._preyReproductionAge*(2*Math.random()-1));
-    if (type == TYPE.PREDATOR) age_offset = Math.floor(this._ageVariance*this._predatorReproductionAge*(2*Math.random()-1));
-    
-    return new Animal(type, age_offset, 0, false);
   }
   
   
@@ -173,91 +201,116 @@ var Wator = (function() {
     this._data.apply(function(i, j, x) { x.moved = false; return x; });
     
     /* move and breed predators */
-    for (var i = 0; i < this._width; ++i) {
-      for (var j = 0; j < this._height; ++j) {
-        var animal = this._data.get(i, j);
-        
-        if (animal.type == TYPE.PREDATOR && !animal.moved) {
-          if (animal.moved) {
-            animal.moved = false;
-            continue;
-          }
-          
-          /* update predator */
-          ++animal.age;
-          ++animal.starvation;
-          animal.moved = true;
-          if (animal.starvation > this._predatorStarvationAge) {
-            this._placeAnimal(i, j, this._makeAnimal(TYPE.NONE)); // RIP ;(
-            --this._predatorCount;
-            continue;
-          }
-          
-          /* shall it catch prey OR move? */
-          var target = undefined;
-          var targets = this.getAdjacentEmptySquares(i, j);
-          if (targets.length != 0) {
-            target = targets[Math.floor(targets.length * Math.random())];
-          }
-          targets = this._getAdjacentPreyAnimals(i, j); // this overwrites previous targets generated
-          if (targets.length != 0) {
-            target = targets[Math.floor(targets.length * Math.random())];
-            animal.starvation = 0;
-            --this._preyCount;
-          }
-          if (target === undefined) continue;
-
-          /* shall it breed? */
-          if (animal.age >= this._predatorReproductionAge) {
-            animal.age = 0;
-             this._placeAnimal(i, j, this._makeAnimal(TYPE.PREDATOR));
-             ++this._predatorCount;
-             ++this._totalPredatorCount;
-          } else {
-            this._placeAnimal(i, j, this._makeAnimal(TYPE.NONE));
-          }
-          
-          /* place animal at target pos. */
-          this._placeAnimal(target.x, target.y, animal);
+    var npredators = [];
+    shuffle(this._predators);
+    for (var i = 0; i < this._predators.length; ++i) {
+      var animal = this._predators[i];
+      
+      if (animal.type == TYPE.PREDATOR && !animal.moved) {
+        if (animal.moved) {
+          animal.moved = false;
+          continue;
         }
+        
+        var x = animal.x;
+        var y = animal.y;
+        
+        /* update predator */
+        ++animal.age;
+        ++animal.starvation;
+        animal.moved = true;
+        if (animal.starvation > this._predatorStarvationAge) {
+          this._placeAnimal(x, y, this._makeAnimal(x, y, TYPE.NONE, 0)); // RIP ;(
+          --this._predatorCount;
+          continue;
+        }
+        
+        /* shall it catch prey OR move? */
+        var target = undefined;
+        var targets = this.getAdjacentEmptySquares(x, y);
+        if (targets.length != 0) {
+          target = targets[Math.floor(targets.length * Math.random())];
+        }
+        targets = this._getAdjacentPreyAnimals(x, y); // this overwrites previous targets generated
+        if (targets.length != 0) {
+          target = targets[Math.floor(targets.length * Math.random())];
+          animal.starvation = 0;
+          --this._preyCount;
+          this._data.get(target.x, target.y).type = TYPE.NONE;
+        }
+        if (target === undefined) {
+          npredators.push(animal);
+          continue;
+        }
+
+        /* shall it breed? */
+        if (animal.age >= this._predatorReproductionAge) {
+          animal.age = 0;
+          var offspring = this._makeAnimal(x, y, TYPE.PREDATOR, this._ageVariance);
+          this._placeAnimal(x, y, offspring);
+          npredators.push(offspring);
+          ++this._predatorCount;
+          ++this._totalPredatorCount;
+        } else {
+          this._placeAnimal(x, y, this._makeAnimal(x, y, TYPE.NONE, 0));
+        }
+        
+        /* place animal at target pos. */
+        animal.x = target.x;
+        animal.y = target.y;
+        this._placeAnimal(target.x, target.y, animal);
+        npredators.push(animal);
       }
     }
+    this._predators = npredators;
     
     /* move and breed prey */
-    for (var i = 0; i < this._width; ++i) {
-      for (var j = 0; j < this._height; ++j) {
-        var animal = this._data.get(i, j);
-        
-        if (animal.type == TYPE.PREY && !animal.moved) {
-          if (animal.moved) {
-            animal.moved = false;
-            continue;
-          }
-          
-          /* update prey */
-          ++animal.age;
-          animal.moved = true;
-          
-          /* shall it move? */
-          var targets = this.getAdjacentEmptySquares(i, j);
-          if (targets.length == 0) continue;
-          var target = targets[Math.floor(targets.length * Math.random())];
-
-          /* shall it breed? */
-          if (animal.age >= this._preyReproductionAge) {
-            animal.age = 0;
-             this._placeAnimal(i, j, this._makeAnimal(TYPE.PREY));
-             ++this._preyCount;
-             ++this._totalPreyCount;
-          } else {
-            this._placeAnimal(i, j, this._makeAnimal(TYPE.NONE));
-          }
-
-          /* place animal at target pos. */
-          this._placeAnimal(target.x, target.y, animal);
+    var nprey = [];
+    shuffle(this._prey);
+    for (var i = 0; i < this._prey.length; ++i) {
+      var animal = this._prey[i];
+      
+      if (animal.type == TYPE.PREY && !animal.moved) {
+        if (animal.moved) {
+          animal.moved = false;
+          continue;
         }
+        
+        var x = animal.x;
+        var y = animal.y;
+        
+        /* update prey */
+        ++animal.age;
+        animal.moved = true;
+        
+        /* shall it move? */
+        var targets = this.getAdjacentEmptySquares(x, y);
+        if (targets.length == 0) {
+          nprey.push(animal);
+          continue;
+        }
+        var target = targets[Math.floor(targets.length * Math.random())];
+
+        /* shall it breed? */
+        if (animal.age >= this._preyReproductionAge) {
+          animal.age = 0;
+          var offspring = this._makeAnimal(x, y, TYPE.PREY, this._ageVariance);
+           this._placeAnimal(x, y, offspring);
+           nprey.push(offspring);
+           ++this._preyCount;
+           ++this._totalPreyCount;
+        } else {
+          this._placeAnimal(x, y, this._makeAnimal(x, y, TYPE.NONE, 0));
+        }
+
+        /* place animal at target pos. */
+        animal.x = target.x;
+        animal.y = target.y;
+        this._placeAnimal(target.x, target.y, animal);
+        nprey.push(animal);
       }
     }
+    this._prey = nprey;
     
   }
   
