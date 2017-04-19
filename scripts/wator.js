@@ -11,7 +11,8 @@ var Wator = (function() {
   
   //! Neighbourhood used.
   var NEIGHBOURHOOD = [
-      [-1, 0], [1, 0], [0, -1], [0, 1]
+      [-1, 0], [1, 0], [0, -1], [0, 1],
+      [-1, -1], [-1, 1], [1, -1], [1, 1]
     ];
   
   
@@ -63,6 +64,7 @@ var Wator = (function() {
     this._predatorCount           = 0;
     this._totalPreyCount          = 0;
     this._totalPredatorCount      = 0;
+    this._score                   = 0;
   }
   
   
@@ -71,6 +73,7 @@ var Wator = (function() {
   Wator.prototype.getPredatorCount            = function() { return this._predatorCount; }
   Wator.prototype.getTotalPreyCount           = function() { return this._totalPreyCount; }
   Wator.prototype.getTotalPredatorCount       = function() { return this._totalPredatorCount; }
+  Wator.prototype.getScore                    = function() { return this._score; }
   Wator.prototype.setPreyReproductionAge      = function(age) { this._preyReproductionAge = age; }
   Wator.prototype.setPredatorReproductionAge  = function(age) { this._predatorReproductionAge = age; }
   Wator.prototype.setPredatorStarvationAge    = function(age) { this._predatorStarvationAge = age; }
@@ -111,6 +114,7 @@ var Wator = (function() {
     this._predatorCount = 0;
     this._totalPreyCount = 0;
     this._totalPredatorCount = 0;
+    this._score = 0;
     
     /* take care of max. number of prey & predators*/
     var ncells = this._width * this._height;
@@ -202,6 +206,7 @@ var Wator = (function() {
    */
   Wator.prototype.update = function() {
     ++this._chronons;
+    if (this._predatorCount > 0) ++this._score;
     
     /* clear moved flags */
     this._data.apply(function(i, j, x) { x.moved = false; return x; });

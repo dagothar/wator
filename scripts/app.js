@@ -37,16 +37,18 @@ var App = (function() {
   
   
   App.prototype._updateUi = function() {
-    var chronons = this._game.getChronons();
-    var prey = this._game.getPreyCount();
+    var chronons  = this._game.getChronons();
+    var prey      = this._game.getPreyCount();
     var totalPrey = this._game.getTotalPreyCount();
     var predators = this._game.getPredatorCount();
+    //var score     = this._game.getScore();
     
     $('.chronons').text(chronons);
     $('.prey-count').text(prey);
     $('.predator-count').text(predators);
     $('.kill-count').text(totalPrey - prey);
     $('.kill-count').text(totalPrey - prey);
+    //$('.score').text(score);
     $('.speed').text((100.0/this._speed).toFixed(1) + 'x');
   }
   
