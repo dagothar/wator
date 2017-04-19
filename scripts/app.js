@@ -21,13 +21,13 @@ var App = (function() {
     $('.button-start').show();
     $('.button-stop').hide();
     $('.slider-speed').val(0);
-    $('.parameter-width').val(100);
-    $('.parameter-height').val(100);
-    $('.parameter-initial-prey').val(100);
-    $('.parameter-initial-predators').val(100);
-    $('.parameter-prey-reproduction').val(100);
-    $('.parameter-predator-reproduction').val(100);
-    $('.parameter-predator-starvation').val(50);
+    $('.parameter-width').val(160);
+    $('.parameter-height').val(120);
+    $('.parameter-initial-prey').val(5000);
+    $('.parameter-initial-predators').val(1000);
+    $('.parameter-prey-reproduction').val(10);
+    $('.parameter-predator-reproduction').val(25);
+    $('.parameter-predator-starvation').val(10);
     
     $('.button-reset').click(function() { self._reset(); });
     $('.button-start').click(function() { self._start(); });
