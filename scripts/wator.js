@@ -83,10 +83,16 @@ var Wator = (function() {
    */
   Wator.prototype._makeAnimal = function(x, y, type, variance) {
     var age_offset = 0;
-    if (type == TYPE.PREY) age_offset = Math.floor(variance*this._preyReproductionAge*(2*Math.random()-1));
-    if (type == TYPE.PREDATOR) age_offset = Math.floor(variance*this._predatorReproductionAge*(2*Math.random()-1));
+    var starvation_offset = 0;
     
-    return new Animal(x, y, type, age_offset, 0, false);
+    if (type == TYPE.PREY) {
+      age_offset = Math.floor(variance*this._preyReproductionAge*(2*Math.random()-1));
+    } else if (type == TYPE.PREDATOR) {
+      age_offset = Math.floor(variance*this._predatorReproductionAge*(2*Math.random()-1));
+      starvation_offset = Math.floor(variance*this._predatorStarvationAge*(2*Math.random()-1));
+    }
+    
+    return new Animal(x, y, type, age_offset, starvation_offset, false);
   }
   
   
