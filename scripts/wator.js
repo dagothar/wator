@@ -212,8 +212,27 @@ var Wator = (function() {
   /**
    * @brief Places animal at (i, j) coordinates.
    */
-  Wator.prototype._placeAnimal = function(i, j, animal) {
+  Wator.prototype._placeAnimal = function(i, j, animal, canvas) {
     this._data.set(i, j, animal);
+    
+    if (canvas) {
+      var ctx = canvas.getContext('2d');
+    
+      var dx = canvas.width / this._width;
+      var dy = canvas.height / this._height;
+      
+      var type = animal.type;
+        
+      if (type == TYPE.NONE) {
+        ctx.fillStyle = 'black';
+      } else if (type == TYPE.PREY) {
+        ctx.fillStyle = 'blue';
+      } else if (type == TYPE.PREDATOR) {
+        ctx.fillStyle = 'red';
+      }
+      
+      ctx.fillRect(animal.x*dx, animal.y*dy, dx, dy);
+    }
   }
   
   
@@ -224,7 +243,7 @@ var Wator = (function() {
    * 2. Move & breed predators,
    * 3. Move and breed prey.
    */
-  Wator.prototype.update = function() {
+  Wator.prototype.update = function(canvas) {
     ++this._chronons;
     if (this._predatorCount > 0) ++this._score;
     
@@ -251,7 +270,7 @@ var Wator = (function() {
         ++animal.starvation;
         animal.moved = true;
         if (animal.starvation > this._predatorStarvationAge) {
-          this._placeAnimal(x, y, this._makeAnimal(x, y, TYPE.NONE, 0)); // RIP ;(
+          this._placeAnimal(x, y, this._makeAnimal(x, y, TYPE.NONE, 0), canvas); // RIP ;(
           --this._predatorCount;
           continue;
         }
@@ -278,18 +297,18 @@ var Wator = (function() {
         if (animal.age >= this._predatorReproductionAge) {
           animal.age = 0;
           var offspring = this._makeAnimal(x, y, TYPE.PREDATOR, this._ageVariance);
-          this._placeAnimal(x, y, offspring);
+          this._placeAnimal(x, y, offspring, canvas);
           npredators.push(offspring);
           ++this._predatorCount;
           ++this._totalPredatorCount;
         } else {
-          this._placeAnimal(x, y, this._makeAnimal(x, y, TYPE.NONE, 0));
+          this._placeAnimal(x, y, this._makeAnimal(x, y, TYPE.NONE, 0), canvas);
         }
         
         /* place animal at target pos. */
         animal.x = target.x;
         animal.y = target.y;
-        this._placeAnimal(target.x, target.y, animal);
+        this._placeAnimal(target.x, target.y, animal, canvas);
         npredators.push(animal);
       }
     }
@@ -326,18 +345,18 @@ var Wator = (function() {
         if (animal.age >= this._preyReproductionAge) {
           animal.age = 0;
           var offspring = this._makeAnimal(x, y, TYPE.PREY, this._ageVariance);
-           this._placeAnimal(x, y, offspring);
+           this._placeAnimal(x, y, offspring, canvas);
            nprey.push(offspring);
            ++this._preyCount;
            ++this._totalPreyCount;
         } else {
-          this._placeAnimal(x, y, this._makeAnimal(x, y, TYPE.NONE, 0));
+          this._placeAnimal(x, y, this._makeAnimal(x, y, TYPE.NONE, 0), canvas);
         }
 
         /* place animal at target pos. */
         animal.x = target.x;
         animal.y = target.y;
-        this._placeAnimal(target.x, target.y, animal);
+        this._placeAnimal(target.x, target.y, animal, canvas);
         nprey.push(animal);
       }
     }

@@ -128,8 +128,8 @@ var App = (function() {
   
   
   App.prototype._update = function() {
-    this._game.update();
-    this._game.render(this._view);
+    this._game.update(this._view);
+    //this._game.render(this._view);
     this._updateUi();
   }
   
