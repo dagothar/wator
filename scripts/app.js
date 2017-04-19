@@ -56,10 +56,10 @@ var App = (function() {
     
     this._stop();
     this._game = new Wator(100, 100);
-    this._game.initialize(initialPrey, initialPredators);
     this._game.setPreyReproductionAge(preyReproductionAge);
     this._game.setPredatorReproductionAge(predatorReproductionAge);
     this._game.setPredatorStarvationAge(predatorStarvationAge);
+    this._game.initialize(initialPrey, initialPredators);
     this._game.render(this._view);
     
     this._updateUi();
