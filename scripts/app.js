@@ -21,6 +21,8 @@ var App = (function() {
     $('.button-start').show();
     $('.button-stop').hide();
     $('.slider-speed').val(0);
+    $('.parameter-width').val(100);
+    $('.parameter-height').val(100);
     $('.parameter-initial-prey').val(100);
     $('.parameter-initial-predators').val(100);
     $('.parameter-prey-reproduction').val(100);
@@ -48,14 +50,16 @@ var App = (function() {
   
   
   App.prototype._reset = function() {
-    var initialPrey = $('.parameter-initial-prey').val();
-    var initialPredators = $('.parameter-initial-predators').val();
-    var preyReproductionAge = $('.parameter-prey-reproduction').val();
-    var predatorReproductionAge = $('.parameter-predator-reproduction').val();
-    var predatorStarvationAge = $('.parameter-predator-starvation').val();
+    var width                   = parseInt($('.parameter-width').val());
+    var height                  = parseInt($('.parameter-height').val());
+    var initialPrey             = parseInt($('.parameter-initial-prey').val());
+    var initialPredators        = parseInt($('.parameter-initial-predators').val());
+    var preyReproductionAge     = parseInt($('.parameter-prey-reproduction').val();
+    var predatorReproductionAge = parseInt($('.parameter-predator-reproduction').val());
+    var predatorStarvationAge   = parseInt($('.parameter-predator-starvation').val());
     
     this._stop();
-    this._game = new Wator(100, 100);
+    this._game = new Wator(width, height);
     this._game.setPreyReproductionAge(preyReproductionAge);
     this._game.setPredatorReproductionAge(predatorReproductionAge);
     this._game.setPredatorStarvationAge(predatorStarvationAge);

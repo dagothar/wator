@@ -4,7 +4,7 @@ var Wator = (function() {
   
   //! Animal types.
   var TYPE = {
-    NONE:      0,
+    NONE:       0,
     PREY:       1,
     PREDATOR:   2
   };
@@ -19,12 +19,12 @@ var Wator = (function() {
    * @brief Animal struct constructor.
    */
   function Animal(x, y, type, age, starvation, moved) {
-    this.x = x;
-    this.y = y;
-    this.type = type;             // tracks the type of the cell
-    this.age = age;                 // tracks the age for reproduction purposes
+    this.x          = x;
+    this.y          = y;
+    this.type       = type;         // tracks the type of the cell
+    this.age        = age;          // tracks the age for reproduction purposes
     this.starvation = starvation;   // tracks the starvation for predators
-    this.moved = moved;             // tracks the movement
+    this.moved      = moved;        // tracks the movement
   }
   
   
@@ -53,28 +53,28 @@ var Wator = (function() {
     this._prey = [];
     this._predators = [];  
     
-    this._preyReproductionAge = 1000;
+    this._preyReproductionAge     = 1000;
     this._predatorReproductionAge = 110;
-    this._predatorStarvationAge = 100;
-    this._ageVariance = 0.1;
+    this._predatorStarvationAge   = 100;
+    this._ageVariance             = 0.1;
     
-    this._chronons = 0;
-    this._preyCount = 0;
-    this._predatorCount = 0;
-    this._totalPreyCount = 0;
-    this._totalPredatorCount = 0;
+    this._chronons                = 0;
+    this._preyCount               = 0;
+    this._predatorCount           = 0;
+    this._totalPreyCount          = 0;
+    this._totalPredatorCount      = 0;
   }
   
   
-  Wator.prototype.getChronons = function() { return this._chronons; }
-  Wator.prototype.getPreyCount = function() { return this._preyCount; }
-  Wator.prototype.getPredatorCount = function() { return this._predatorCount; }
-  Wator.prototype.getTotalPreyCount = function() { return this._totalPreyCount; }
-  Wator.prototype.getTotalPredatorCount = function() { return this._totalPredatorCount; }
-  Wator.prototype.setPreyReproductionAge = function(age) { this._preyReproductionAge = age; }
-  Wator.prototype.setPredatorReproductionAge = function(age) { this._predatorReproductionAge = age; }
-  Wator.prototype.setPredatorStarvationAge = function(age) { this._predatorStarvationAge = age; }
-  Wator.prototype.setAgeVariance = function(age) { this._ageVariance = age; }
+  Wator.prototype.getChronons                 = function() { return this._chronons; }
+  Wator.prototype.getPreyCount                = function() { return this._preyCount; }
+  Wator.prototype.getPredatorCount            = function() { return this._predatorCount; }
+  Wator.prototype.getTotalPreyCount           = function() { return this._totalPreyCount; }
+  Wator.prototype.getTotalPredatorCount       = function() { return this._totalPredatorCount; }
+  Wator.prototype.setPreyReproductionAge      = function(age) { this._preyReproductionAge = age; }
+  Wator.prototype.setPredatorReproductionAge  = function(age) { this._predatorReproductionAge = age; }
+  Wator.prototype.setPredatorStarvationAge    = function(age) { this._predatorStarvationAge = age; }
+  Wator.prototype.setAgeVariance              = function(age) { this._ageVariance = age; }
   
   
   /**
