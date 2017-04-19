@@ -9,11 +9,16 @@ var Wator = (function() {
     PREDATOR:   2
   };
   
-  //! Neighbourhood used.
-  var NEIGHBOURHOOD = [
-      [-1, 0], [1, 0], [0, -1], [0, 1],
-      [-1, -1], [-1, 1], [1, -1], [1, 1]
-    ];
+  //! Neumann neighbourhood.
+  var NEUMANN = [
+    [-1, 0], [1, 0], [0, -1], [0, 1]
+  ];
+  
+  //! Moore neighbourhood.
+  var MOORE = [
+    [-1, 0], [1, 0], [0, -1], [0, 1],
+    [-1, -1], [-1, 1], [1, -1], [1, 1]
+  ];
   
   
   /**
@@ -58,6 +63,7 @@ var Wator = (function() {
     this._predatorReproductionAge = 110;
     this._predatorStarvationAge   = 100;
     this._ageVariance             = 0.1;
+    this._neighbourhood           = NEUMANN;
     
     this._chronons                = 0;
     this._preyCount               = 0;
@@ -78,6 +84,20 @@ var Wator = (function() {
   Wator.prototype.setPredatorReproductionAge  = function(age) { this._predatorReproductionAge = age; }
   Wator.prototype.setPredatorStarvationAge    = function(age) { this._predatorStarvationAge = age; }
   Wator.prototype.setAgeVariance              = function(age) { this._ageVariance = age; }
+  
+  Wator.prototype.setNeighbourhood            = function(neighbourhood) {
+    switch(neighbourhood) {
+      case 'moore':
+        this._neighbourhood = MOORE;
+        console.log('!');
+        break;
+        
+      default:
+      case 'neumann':
+        this._neighbourhood = NEUMANN;
+        break;
+    }
+  }
   
   
   /**
@@ -158,9 +178,9 @@ var Wator = (function() {
    */
   Wator.prototype.getAdjacentEmptySquares = function(x, y) {
     var cells = [];
-    for (var i = 0; i < NEIGHBOURHOOD.length; ++i) {
-      var nx = (this._width + x + NEIGHBOURHOOD[i][0]) % this._width;
-      var ny = (this._height + y + NEIGHBOURHOOD[i][1]) % this._height;
+    for (var i = 0; i < this._neighbourhood.length; ++i) {
+      var nx = (this._width + x + this._neighbourhood[i][0]) % this._width;
+      var ny = (this._height + y + this._neighbourhood[i][1]) % this._height;
       
       if (this._data.get(nx, ny).type == TYPE.NONE) {
         cells.push({ x: nx, y: ny });
@@ -176,9 +196,9 @@ var Wator = (function() {
    */
   Wator.prototype._getAdjacentPreyAnimals = function(x, y) {
     var cells = [];
-    for (var i = 0; i < NEIGHBOURHOOD.length; ++i) {
-      var nx = (this._width + x + NEIGHBOURHOOD[i][0]) % this._width;
-      var ny = (this._height + y + NEIGHBOURHOOD[i][1]) % this._height;
+    for (var i = 0; i < this._neighbourhood.length; ++i) {
+      var nx = (this._width + x + this._neighbourhood[i][0]) % this._width;
+      var ny = (this._height + y + this._neighbourhood[i][1]) % this._height;
       
       if (this._data.get(nx, ny).type == TYPE.PREY) {
         cells.push({ x: nx, y: ny });

@@ -30,6 +30,7 @@ var App = (function() {
     $('.parameter-predator-reproduction').val(25);
     $('.parameter-predator-starvation').val(10);
     $('.slider-variance').val(50);
+    $('#neighbourhood').val('neumann');
     
     $('.button-reset').click(function() { self._reset(); });
     $('.button-start').click(function() { self._start(); });
@@ -45,8 +46,8 @@ var App = (function() {
     
     this._preyData.push({x: chronons, y: prey});
     this._predatorData.push({x: chronons, y: predators});
-    if (this._preyData.length > 1000) this._preyData.shift();
-    if (this._predatorData.length > 1000) this._predatorData.shift();
+    if (this._preyData.length > 500) this._preyData.shift();
+    if (this._predatorData.length > 500) this._predatorData.shift();
     
     var min = this._preyData[0].x;
     var max = this._preyData.slice(-1)[0].x;
@@ -107,6 +108,7 @@ var App = (function() {
     var predatorReproductionAge = parseInt($('.parameter-predator-reproduction').val());
     var predatorStarvationAge   = parseInt($('.parameter-predator-starvation').val());
     var ageVariance             = 0.01 * $('.slider-variance').val();
+    var neighbourhood           = $('#neighbourhood').val();
     
     this._stop();
     this._game = new Wator(width, height);
@@ -114,6 +116,7 @@ var App = (function() {
     this._game.setPredatorReproductionAge(predatorReproductionAge);
     this._game.setPredatorStarvationAge(predatorStarvationAge);
     this._game.setAgeVariance(ageVariance);
+    this._game.setNeighbourhood(neighbourhood);
     this._game.initialize(initialPrey, initialPredators);
     this._game.render(this._view);
     
