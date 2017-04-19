@@ -3,13 +3,14 @@
 var App = (function() {
   
   function App() {
-    this._updateTimer = undefined;
-    this._running     = false;
-    this._game        = undefined;
-    this._view        = undefined;
-    this._chartView   = undefined;
-    this._chart       = undefined;
-    this._speed       = 100;
+    this._updateTimer   = undefined;
+    this._running       = false;
+    this._game          = undefined;
+    this._view          = undefined;
+    this._chart         = undefined;
+    this._preyData      = [];
+    this._predatorData  = [];
+    this._speed         = 100;
   };
   
   
@@ -17,7 +18,7 @@ var App = (function() {
     var self = this;
     
     this._view = $('#view').get(0);
-    this._chartView = $('#chart').get(0);
+    
     $('.button-start').show();
     $('.button-stop').hide();
     $('.slider-speed').val(0);
@@ -36,6 +37,47 @@ var App = (function() {
   }
   
   
+  App.prototype._updateChart = function() {
+    var chronons  = this._game.getChronons();
+    var prey      = this._game.getPreyCount();
+    var predators = this._game.getPredatorCount();
+    
+    this._preyData.push({x: chronons, y: prey});
+    this._predatorData.push({x: chronons, y: predators});
+    if (this._preyData.length > 1000) this._preyData.shift();
+    if (this._predatorData.length > 1000) this._predatorData.shift();
+    
+    var min = this._preyData[0].x;
+    var max = this._preyData.slice(-1)[0].x;
+    
+    if (! (chronons % 10)) {
+      if (this._chart) this._chart.destroy();
+      this._chart = new Chart(
+        'chart',
+        {
+          type: 'line',
+          data: {
+            datasets: [
+              { label: 'prey', yAxisID: 'A', data: this._preyData, borderColor: 'blue', backgroundColor: 'rgba(0, 0, 255, 0.3)', pointRadius: 0 },
+              { label: 'predators', yAxisID: 'B', data: this._predatorData, borderColor: 'red', backgroundColor: 'rgba(255, 0, 0, 0.3)', pointRadius: 0 }
+            ]
+          },
+          options: {
+            animation: false,
+            scales: {
+              xAxes: [{ type: 'linear', position: 'bottom', ticks: { min: min, max: max } }],
+              yAxes: [
+                { id: 'A', type: 'linear', position: 'left' },
+                { id: 'B', type: 'linear', position: 'right' },
+              ]
+            }
+          }
+        }
+      );
+    }
+  }
+  
+  
   App.prototype._updateUi = function() {
     var chronons  = this._game.getChronons();
     var prey      = this._game.getPreyCount();
@@ -50,6 +92,8 @@ var App = (function() {
     $('.kill-count').text(totalPrey - prey);
     //$('.score').text(score);
     $('.speed').text((100.0/this._speed).toFixed(1) + 'x');
+    
+    this._updateChart();
   }
   
   
@@ -69,6 +113,9 @@ var App = (function() {
     this._game.setPredatorStarvationAge(predatorStarvationAge);
     this._game.initialize(initialPrey, initialPredators);
     this._game.render(this._view);
+    
+    this._preyData = [];
+    this._predatorData = [];
     
     this._updateUi();
   }
