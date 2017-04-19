@@ -244,6 +244,12 @@ var Wator = (function() {
    * 3. Move and breed prey.
    */
   Wator.prototype.update = function(canvas) {
+    if (canvas) {
+      var ctx = canvas.getContext('2d');
+      ctx.fillStyle = 'black';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    
     ++this._chronons;
     if (this._predatorCount > 0) ++this._score;
     
@@ -289,6 +295,7 @@ var Wator = (function() {
           this._data.get(target.x, target.y).type = TYPE.NONE;
         }
         if (target === undefined) {
+          this._placeAnimal(animal.x, animal.y, animal, canvas);
           npredators.push(animal);
           continue;
         }
@@ -336,6 +343,7 @@ var Wator = (function() {
         /* shall it move? */
         var targets = this.getAdjacentEmptySquares(x, y);
         if (targets.length == 0) {
+          this._placeAnimal(animal.x, animal.y, animal, canvas);
           nprey.push(animal);
           continue;
         }

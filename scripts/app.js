@@ -67,7 +67,7 @@ var App = (function() {
           options: {
             animation: false,
             scales: {
-              xAxes: [{ type: 'linear', position: 'bottom', ticks: { min: min, max: max } }],
+              xAxes: [{ type: 'linear', position: 'bottom', ticks: { min: min, max: max, maxRotation: 0 } }],
               yAxes: [
                 { id: 'A', type: 'linear', position: 'left' },
                 { id: 'B', type: 'linear', position: 'right' },
