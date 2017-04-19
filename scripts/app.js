@@ -4,12 +4,12 @@ var App = (function() {
   
   function App() {
     this._updateTimer = undefined;
-    this._running = false;
-    this._game = undefined;
-    this._view = undefined;
-    this._chartView = undefined;
-    this._chart = undefined;
-    this._speed = 100;
+    this._running     = false;
+    this._game        = undefined;
+    this._view        = undefined;
+    this._chartView   = undefined;
+    this._chart       = undefined;
+    this._speed       = 100;
   };
   
   
@@ -46,6 +46,8 @@ var App = (function() {
     $('.prey-count').text(prey);
     $('.predator-count').text(predators);
     $('.kill-count').text(totalPrey - prey);
+    $('.kill-count').text(totalPrey - prey);
+    $('.speed').text((100.0/this._speed).toFixed(1) + 'x');
   }
   
   
@@ -54,7 +56,7 @@ var App = (function() {
     var height                  = parseInt($('.parameter-height').val());
     var initialPrey             = parseInt($('.parameter-initial-prey').val());
     var initialPredators        = parseInt($('.parameter-initial-predators').val());
-    var preyReproductionAge     = parseInt($('.parameter-prey-reproduction').val();
+    var preyReproductionAge     = parseInt($('.parameter-prey-reproduction').val());
     var predatorReproductionAge = parseInt($('.parameter-predator-reproduction').val());
     var predatorStarvationAge   = parseInt($('.parameter-predator-starvation').val());
     
@@ -107,6 +109,7 @@ var App = (function() {
       var self = this;
       this._updateTimer = setInterval(function() { self._update(); }, this._speed);
     } 
+    this._updateUi();
   }
   
   
