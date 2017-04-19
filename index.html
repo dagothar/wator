@@ -33,9 +33,19 @@
             
             <!--<p>Score: <span class="pull-right text-warning score">0</span></p>-->
             
+            <!-- plot -->
             <div class="chart-container">
               <canvas id="chart" width="250" height="200">
             </div>
+            
+            <form class="form-horizontal">
+              <div class="form-group">
+                <label class="control-label col-sm-6">Update chart</label>
+                <div class="col-sm-6">
+                  <input type="checkbox" id="update-chart"/>
+                </div>
+              </div>
+            </form>
             
           </div>
         </div>
@@ -146,7 +156,7 @@
             
             <!-- speed slider -->
             <div class="form-group">
-              <label>speed:</label> <span class="speed pull-right">0</span>
+              <label>Speed:</label> <span class="speed pull-right">0</span>
               <input type="range" min="-10" val="0" max="10" class="slider-speed"/>
             </div>
             

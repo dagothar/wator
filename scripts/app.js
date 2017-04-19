@@ -52,7 +52,7 @@ var App = (function() {
     var min = this._preyData[0].x;
     var max = this._preyData.slice(-1)[0].x;
     
-    if (! (chronons % 10)) {
+    if (! (chronons % 10) && ($('#update-chart').is(':checked') || chronons == 0)) {
       if (this._chart) this._chart.destroy();
       this._chart = new Chart(
         'chart',
